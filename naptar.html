@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mai és Holnapi Névnap és Információk</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #CD2A3E 0%, #FFFFFF 50%, #436F4D 100%);
+            color: white;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .calendar-container {
+            background-color: rgba(30, 30, 30, 0.35);
+            padding: 30px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            min-width: 380px;
+            max-width: 550px;
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            transition: all 0.3s ease;
+        }
+
+        #current-date {
+            font-size: 1.75em;
+            font-weight: 600;
+            color: #61DAFB; /* Új kiemelő szín */
+            text-shadow: 0 0 8px rgba(0,0,0,0.55), 0 0 3px rgba(0,0,0,0.4);
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 12px;
+        }
+
+        .info-line {
+            font-size: 0.95em;
+            color: #FFFFFF;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .name-day-label {
+            font-size: 1.15em;
+            color: #FFFFFF;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.65);
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        #name-day, #tomorrow-name-day { /* Kiegészítve a holnapi névnap ID-jével */
+            font-size: 1.65em;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-shadow: 0 0 10px rgba(0,0,0,0.65), 0 0 5px rgba(0,0,0,0.45);
+            min-height: 28px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="calendar-container">
+        <div id="current-date">Betöltés...</div>
+        <div class="info-line" id="date-details-info"></div>
+        <div class="info-line" id="days-left-info"></div>
+
+        <div class="name-day-label">A mai névnap(ok):</div>
+        <div id="name-day">Keresés...</div>
+
+        <div class="name-day-label" style="margin-top: 20px;">A holnapi névnap(ok):</div>
+        <div id="tomorrow-name-day">Keresés...</div>
+    </div>
+
+    <script>
+        const nameDays = {
+            "január 1": ["Fruzsina"],"január 2": ["Ábel"],"január 3": ["Benjámin", "Genovéva"],"január 4": ["Leóna", "Titusz"],"január 5": ["Simon"],"január 6": ["Boldizsár"],"január 7": ["Attila", "Ramóna"],"január 8": ["Gyöngyvér"],"január 9": ["Marcell"],"január 10": ["Melánia"],"január 11": ["Ágota"],"január 12": ["Ernő"],"január 13": ["Veronika"],"január 14": ["Bódog"],"január 15": ["Lóránd", "Lóránt"],"január 16": ["Gusztáv"],"január 17": ["Antal", "Antónia"],"január 18": ["Piroska"],"január 19": ["Márió", "Sára"],"január 20": ["Fábián", "Sebestyén"],"január 21": ["Ágnes"],"január 22": ["Artúr", "Vince"],"január 23": ["Rajmund", "Zelma"],"január 24": ["Timót"],"január 25": ["Pál"],"január 26": ["Paula", "Vanda"],"január 27": ["Angelika"],"január 28": ["Karola", "Károly"],"január 29": ["Adél"],"január 30": ["Martina"],"január 31": ["Gerda", "Marcella"],
+            "február 1": ["Ignác"],"február 2": ["Aida", "Karolina"],"február 3": ["Balázs"],"február 4": ["Csenge", "Ráhel"],"február 5": ["Ágota", "Ingrid"],"február 6": ["Dóra", "Dorottya"],"február 7": ["Rómeó", "Tódor"],"február 8": ["Aranka"],"február 9": ["Abigél", "Alex"],"február 10": ["Elvira"],"február 11": ["Bertold", "Marietta"],"február 12": ["Lídia", "Lívia"],"február 13": ["Ella", "Linda"],"február 14": ["Bálint", "Valentin"],"február 15": ["Georgina", "Kolos"],"február 16": ["Julianna", "Lilla"],"február 17": ["Donát"],"február 18": ["Bernadett"],"február 19": ["Zsuzsanna"],"február 20": ["Aladár", "Álmos"],"február 21": ["Eleonóra"],"február 22": ["Gerzson"],"február 23": ["Alfréd"],"február 24": ["Mátyás"],"február 25": ["Géza"],"február 26": ["Edina"],"február 27": ["Ákos", "Bátor"],"február 28": ["Elemér"],
+            "március 1": ["Albin"],"március 2": ["Lujza"],"március 3": ["Kornélia"],"március 4": ["Kázmér"],"március 5": ["Adorján", "Adrián"],"március 6": ["Inez", "Leonóra"],"március 7": ["Tamás"],"március 8": ["Zoltán"],"március 9": ["Fanni", "Franciska"],"március 10": ["Ildikó"],"március 11": ["Szilárd"],"március 12": ["Gergely"],"március 13": ["Ajtony", "Krisztián"],"március 14": ["Matild"],"március 15": ["Kristóf"],"március 16": ["Henrietta"],"március 17": ["Gertrúd", "Patrik"],"március 18": ["Ede", "Sándor"],"március 19": ["Bánk", "József"],"március 20": ["Klaudia"],"március 21": ["Benedek"],"március 22": ["Beáta", "Izolda"],"március 23": ["Emőke"],"március 24": ["Gábor", "Karina"],"március 25": ["Irén", "Írisz"],"március 26": ["Emánuel"],"március 27": ["Hajnalka"],"március 28": ["Gedeon", "Johanna"],"március 29": ["Auguszta"],"március 30": ["Zalán"],"március 31": ["Árpád"],
+            "április 1": ["Hugó"],"április 2": ["Áron"],"április 3": ["Buda", "Richárd"],"április 4": ["Izidor"],"április 5": ["Vince"],"április 6": ["Bíborka", "Vilmos"],"április 7": ["Herman"],"április 8": ["Dénes"],"április 9": ["Erhard"],"április 10": ["Zsolt"],"április 11": ["Leó", "Szaniszló"],"április 12": ["Gyula"],"április 13": ["Ida"],"április 14": ["Tibor"],"április 15": ["Anasztázia", "Tas"],"április 16": ["Csongor"],"április 17": ["Rudolf"],"április 18": ["Andrea", "Ilma"],"április 19": ["Emma"],"április 20": ["Tivadar"],"április 21": ["Konrád"],"április 22": ["Csilla", "Noémi"],"április 23": ["Béla"],"április 24": ["György"],"április 25": ["Márk"],"április 26": ["Ervin"],"április 27": ["Zita"],"április 28": ["Valéria"],"április 29": ["Péter"],"április 30": ["Katalin", "Kitti"],
+            "május 1": ["Fülöp", "Jakab"],"május 2": ["Zsigmond"],"május 3": ["Irma", "Tímea"],"május 4": ["Flórián", "Mónika"],"május 5": ["Adrián", "Györgyi"],"május 6": ["Frida", "Ivett"],"május 7": ["Gizella"],"május 8": ["Mihály"],"május 9": ["Gergely"],"május 10": ["Ármin", "Pálma"],"május 11": ["Ferenc"],"május 12": ["Pongrác"],"május 13": ["Imola", "Szervác"],"május 14": ["Bonifác"],"május 15": ["Szonja", "Zsófia"],"május 16": ["Botond", "Mózes"],"május 17": ["Paszkál"],"május 18": ["Alexandra", "Erik"],"május 19": ["Ivó", "Milán"],"május 20": ["Bernát", "Felícia"],"május 21": ["Konstantin"],"május 22": ["Júlia", "Rita"],"május 23": ["Dezső"],"május 24": ["Eliza", "Eszter"],"május 25": ["Orbán"],"május 26": ["Evelin", "Fülöp"],"május 27": ["Hella"],"május 28": ["Csanád", "Emil"],"május 29": ["Magdolna"],"május 30": ["Janka", "Zsanett"],"május 31": ["Angéla", "Petronella"],
+            "június 1": ["Tünde"],"június 2": ["Anita", "Kármen"],"június 3": ["Klotild"],"június 4": ["Bulcsú"],"június 5": ["Fatime"],"június 6": ["Cintia", "Norbert"],"június 7": ["Róbert"],"június 8": ["Medárd"],"június 9": ["Félix"],"június 10": ["Gréta", "Margit"],"június 11": ["Barnabás"],"június 12": ["Villő"],"június 13": ["Anett", "Antal"],"június 14": ["Vazul"],"június 15": ["Jolán", "Vid"],"június 16": ["Jusztin"],"június 17": ["Alida", "Laura"],"június 18": ["Arnold", "Levente"],"június 19": ["Gyárfás"],"június 20": ["Rafael"],"június 21": ["Alajos", "Leila"],"június 22": ["Paulina"],"június 23": ["Zoltán"],"június 24": ["Iván"],"június 25": ["Vilmos"],"június 26": ["János", "Pál"],"június 27": ["László"],"június 28": ["Irén", "Levente"],"június 29": ["Péter", "Pál"],"június 30": ["Pál"],
+            "július 1": ["Annamária", "Tihamér"],"július 2": ["Ottó"],"július 3": ["Kornél", "Soma"],"július 4": ["Ulrik"],"július 5": ["Emese", "Sarolta"],"július 6": ["Csaba"],"július 7": ["Apollónia"],"július 8": ["Ellák"],"július 9": ["Lukrécia"],"július 10": ["Amália"],"július 11": ["Lili", "Nóra"],"július 12": ["Dalma", "Izabella"],"július 13": ["Jenő"],"július 14": ["Örs", "Stella"],"július 15": ["Henrik", "Roland"],"július 16": ["Valter"],"július 17": ["Elek", "Endre"],"július 18": ["Frigyes"],"július 19": ["Emília"],"július 20": ["Illés"],"július 21": ["Dániel", "Daniella"],"július 22": ["Magdolna"],"július 23": ["Lenke"],"július 24": ["Kincső", "Kinga"],"július 25": ["Jakab", "Kristóf"],"július 26": ["Anikó", "Anna"],"július 27": ["Liliána", "Olga"],"július 28": ["Szabolcs"],"július 29": ["Flóra", "Márta"],"július 30": ["Judit", "Xénia"],"július 31": ["Oszkár"],
+            "augusztus 1": ["Boglárka"],"augusztus 2": ["Lehel"],"augusztus 3": ["Hermina"],"augusztus 4": ["Dominika", "Domonkos"],"augusztus 5": ["Krisztina"],"augusztus 6": ["Berta", "Bettina"],"augusztus 7": ["Ibolya"],"augusztus 8": ["László"],"augusztus 9": ["Emőd"],"augusztus 10": ["Lőrinc"],"augusztus 11": ["Tiborc", "Zsuzsanna"],"augusztus 12": ["Klára"],"augusztus 13": ["Ipoly"],"augusztus 14": ["Marcell"],"augusztus 15": ["Mária"],"augusztus 16": ["Ábrahám"],"augusztus 17": ["Jácint"],"augusztus 18": ["Ilona"],"augusztus 19": ["Huba"],"augusztus 20": ["István"],"augusztus 21": ["Hajna", "Sámuel"],"augusztus 22": ["Menyhért", "Mirjam"],"augusztus 23": ["Bence"],"augusztus 24": ["Bertalan"],"augusztus 25": ["Lajos", "Patrícia"],"augusztus 26": ["Izsó"],"augusztus 27": ["Gáspár"],"augusztus 28": ["Ágoston"],"augusztus 29": ["Beatrix", "Erna"],"augusztus 30": ["Rózsa"],"augusztus 31": ["Bella", "Erika"],
+            "szeptember 1": ["Egon", "Egyed"],"szeptember 2": ["Dorina", "Rebeka"],"szeptember 3": ["Hilda"],"szeptember 4": ["Rozália"],"szeptember 5": ["Lőrinc", "Viktor"],"szeptember 6": ["Zakariás"],"szeptember 7": ["Regina"],"szeptember 8": ["Adrienn", "Mária"],"szeptember 9": ["Ádám"],"szeptember 10": ["Hunor", "Nikolett"],"szeptember 11": ["Teodóra"],"szeptember 12": ["Mária"],"szeptember 13": ["Kornél"],"szeptember 14": ["Roxána", "Szeréna"],"szeptember 15": ["Enikõ", "Melitta"],"szeptember 16": ["Edit"],"szeptember 17": ["Zsófia"],"szeptember 18": ["Diána"],"szeptember 19": ["Vilhelmina"],"szeptember 20": ["Friderika"],"szeptember 21": ["Máté", "Mirella"],"szeptember 22": ["Móric"],"szeptember 23": ["Tekla"],"szeptember 24": ["Gellért", "Mercédesz"],"szeptember 25": ["Eufrozina", "Kende"],"szeptember 26": ["Jusztina", "Pál"],"szeptember 27": ["Adalbert"],"szeptember 28": ["Vencel"],"szeptember 29": ["Mihály"],"szeptember 30": ["Jeromos"],
+            "október 1": ["Malvin"],"október 2": ["Petra"],"október 3": ["Helga"],"október 4": ["Ferenc"],"október 5": ["Aurél"],"október 6": ["Brúnó", "Renáta"],"október 7": ["Amália"],"október 8": ["Koppány"],"október 9": ["Dénes"],"október 10": ["Gedeon"],"október 11": ["Brigitta"],"október 12": ["Miksa"],"október 13": ["Ede", "Kálmán"],"október 14": ["Helén"],"október 15": ["Teréz"],"október 16": ["Gál"],"október 17": ["Hedvig"],"október 18": ["Lukács"],"október 19": ["Nándor"],"október 20": ["Vendel"],"október 21": ["Orsolya"],"október 22": ["Előd"],"október 23": ["Gyöngyi"],"október 24": ["Salamon"],"október 25": ["Bianka", "Blanka"],"október 26": ["Dömötör"],"október 27": ["Szabina"],"október 28": ["Simon", "Szimonetta"],"október 29": ["Nárcisz"],"október 30": ["Alfonz"],"október 31": ["Farkas"],
+            "november 1": ["Marianna"],"november 2": ["Achilles"],"november 3": ["Győző"],"november 4": ["Károly"],"november 5": ["Imre"],"november 6": ["Lénárd"],"november 7": ["Rezső"],"november 8": ["Zsombor"],"november 9": ["Tivadar"],"november 10": ["Réka"],"november 11": ["Márton"],"november 12": ["Jónás", "Renátó"],"november 13": ["Szilvia"],"november 14": ["Aliz"],"november 15": ["Albert", "Lipót"],"november 16": ["Ödön"],"november 17": ["Gergő", "Hortenzia"],"november 18": ["Jenő"],"november 19": ["Erzsébet"],"november 20": ["Jolán"],"november 21": ["Olivér"],"november 22": ["Cecília"],"november 23": ["Kelemen", "Klementina"],"november 24": ["Emma"],"november 25": ["Katalin"],"november 26": ["Virág"],"november 27": ["Virgil"],"november 28": ["Stefánia"],"november 29": ["Taksony"],"november 30": ["Andor", "András"],
+            "december 1": ["Elza"],"december 2": ["Melinda", "Vivien"],"december 3": ["Ferenc", "Olívia"],"december 4": ["Barbara", "Borbála"],"december 5": ["Vilma"],"december 6": ["Miklós"],"december 7": ["Ambrus"],"december 8": ["Mária"],"december 9": ["Natália"],"december 10": ["Judit"],"december 11": ["Árpád"],"december 12": ["Gabriella"],"december 13": ["Luca", "Otília"],"december 14": ["Szilárda"],"december 15": ["Valér"],"december 16": ["Aletta", "Etelka"],"december 17": ["Lázár", "Olimpia"],"december 18": ["Auguszta"],"december 19": ["Viola"],"december 20": ["Teofil"],"december 21": ["Tamás"],"december 22": ["Zénó"],"december 23": ["Viktória"],"december 24": ["Ádám", "Éva"],"december 25": ["Eugénia"],"december 26": ["István"],"december 27": ["János"],"december 28": ["Kamilla"],"december 29": ["Tamara", "Tamás"],"december 30": ["Dávid"],"december 31": ["Szilveszter"]
+        };
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            return Math.floor((date - start) / (1000 * 60 * 60 * 24));
+        }
+
+        function daysUntilNewYearEve(today) {
+            const currentYear = today.getFullYear();
+            const newYearsEve = new Date(currentYear, 11, 31);
+            return Math.max(0, Math.ceil((newYearsEve - today) / (1000 * 60 * 60 * 24)));
+        }
+
+        function displayDateAndNameDayInfo() {
+            const today = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('current-date').textContent = today.toLocaleDateString('hu-HU', dateOptions);
+
+            const monthNamesHu = ["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"];
+
+            // Mai névnap
+            const monthKeyToday = monthNamesHu[today.getMonth()];
+            const dayKeyToday = today.getDate();
+            const lookupKeyToday = `${monthKeyToday} ${dayKeyToday}`;
+            const namesForToday = nameDays[lookupKeyToday];
+            document.getElementById('name-day').textContent = (namesForToday && namesForToday.length > 0) ? namesForToday.join(', ') : "Nincs rögzített névnap.";
+
+            // Holnapi névnap
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1); // Holnapra állítjuk a dátumot
+
+            const monthKeyTomorrow = monthNamesHu[tomorrow.getMonth()];
+            const dayKeyTomorrow = tomorrow.getDate();
+            const lookupKeyTomorrow = `${monthKeyTomorrow} ${dayKeyTomorrow}`;
+            const namesForTomorrow = nameDays[lookupKeyTomorrow];
+            document.getElementById('tomorrow-name-day').textContent = (namesForTomorrow && namesForTomorrow.length > 0) ? namesForTomorrow.join(', ') : "Nincs rögzített névnap.";
+
+            const weekNum = getWeekNumber(today);
+            const monthNum = today.getMonth() + 1;
+            const dayOfYearNum = getDayOfYear(today);
+            document.getElementById('date-details-info').textContent = `Az év ${monthNum}. hónapja, ${weekNum}. hete és ${dayOfYearNum}. napja.`;
+
+            const daysLeft = daysUntilNewYearEve(today);
+            document.getElementById('days-left-info').textContent = `Ebből az évből Szilveszterig még ${daysLeft} nap van hátra.`;
+        }
+
+        function scheduleMidnightDateRefresh() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const msUntilMidnight = tomorrow.getTime() - now.getTime();
+            setTimeout(() => {
+                displayDateAndNameDayInfo();
+                scheduleMidnightDateRefresh();
+            }, msUntilMidnight);
+        }
+
+        window.onload = () => {
+            displayDateAndNameDayInfo();
+            scheduleMidnightDateRefresh();
+        };
+    </script>
+
+</body>
+</html>
