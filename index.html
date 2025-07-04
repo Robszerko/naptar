@@ -4,71 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mai és Holnapi Névnap és Információk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-red: #CD2A3E;
+            --color-green: #436F4D;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-medium: rgba(255, 255, 255, 0.7);
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
+            font-family: 'Poppins', 'Segoe UI', 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #CD2A3E 0%, #FFFFFF 50%, #436F4D 100%);
-            color: white;
+            background-color: #1a1a1a;
+            background-image: radial-gradient(circle, rgba(45,45,45,1) 0%, rgba(20,20,20,1) 100%);
+            color: var(--text-light);
             box-sizing: border-box;
             overflow-x: hidden;
         }
 
         .calendar-container {
-            background-color: rgba(30, 30, 30, 0.35);
-            padding: 30px 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            background-color: rgba(30, 30, 30, 0.5);
+            padding: 35px 45px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
-            min-width: 380px;
-            max-width: 550px;
-            backdrop-filter: blur(10px) saturate(150%);
-            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            width: 100%;
+            max-width: 650px;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             transition: all 0.3s ease;
         }
 
         #current-date {
-            font-size: 1.75em;
-            font-weight: 600;
-            color: #61DAFB; /* Új kiemelő szín */
-            text-shadow: 0 0 8px rgba(0,0,0,0.55), 0 0 3px rgba(0,0,0,0.4);
+            font-size: 2.5em;
+            font-weight: 700;
             margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            padding-bottom: 12px;
+            background: linear-gradient(90deg, var(--color-red), #FFFFFF, var(--color-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            letter-spacing: -1px;
         }
 
         .info-line {
-            font-size: 0.95em;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-            margin-top: 8px;
+            font-size: 0.9em;
+            color: var(--text-medium);
+            font-weight: 300;
+            margin-top: 5px;
             line-height: 1.6;
+        }
+        
+        .divider {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 30px 0;
+        }
+
+        .day-sections-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .day-section {
+            flex: 1;
+            min-width: 220px;
         }
 
         .name-day-label {
-            font-size: 1.15em;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.1em;
+            color: var(--text-medium);
             margin-top: 18px;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
+            font-weight: 300;
+            padding-bottom: 8px;
+        }
+
+        .label-today {
+            border-bottom: 2px solid var(--color-red);
+        }
+        
+        .label-tomorrow {
+            border-bottom: 2px solid var(--color-green);
+        }
+
+        .name-day-label svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.8;
+        }
+
+        #name-day, #tomorrow-name-day {
+            font-size: 1.9em;
             font-weight: 600;
-        }
-
-        #name-day, #tomorrow-name-day { /* Kiegészítve a holnapi névnap ID-jével */
-            font-size: 1.65em;
-            font-weight: bold;
-            color: #FFFFFF;
-            text-shadow: 0 0 10px rgba(0,0,0,0.65), 0 0 5px rgba(0,0,0,0.45);
-            min-height: 28px;
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            min-height: 35px;
             margin-bottom: 20px;
+            line-height: 1.3;
         }
-
+        
+        /* Reszponzív dizájn mobilra */
+        @media (max-width: 680px) {
+            body {
+                padding: 15px;
+            }
+            .calendar-container {
+                padding: 25px;
+                max-width: 400px;
+            }
+            .day-sections-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            #current-date {
+                font-size: 1.8em;
+            }
+            #name-day, #tomorrow-name-day {
+                font-size: 1.6em;
+            }
+            .day-section {
+                min-width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -78,11 +153,25 @@
         <div class="info-line" id="date-details-info"></div>
         <div class="info-line" id="days-left-info"></div>
 
-        <div class="name-day-label">A mai névnap(ok):</div>
-        <div id="name-day">Keresés...</div>
+        <hr class="divider">
 
-        <div class="name-day-label" style="margin-top: 20px;">A holnapi névnap(ok):</div>
-        <div id="tomorrow-name-day">Keresés...</div>
+        <div class="day-sections-container">
+            <div class="day-section">
+                <div class="name-day-label label-today">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M9.75 12.75h.008v.008H9.75v-.008zM9.75 15.75h.008v.008H9.75v-.008zM12 12.75h.008v.008H12v-.008zM12 15.75h.008v.008H12v-.008zM14.25 12.75h.008v.008H14.25v-.008zM14.25 15.75h.008v.008H14.25v-.008z" /></svg>
+                    <span>A mai névnap(ok)</span>
+                </div>
+                <div id="name-day">Keresés...</div>
+            </div>
+
+            <div class="day-section">
+                <div class="name-day-label label-tomorrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>A holnapi névnap(ok)</span>
+                </div>
+                <div id="tomorrow-name-day">Keresés...</div>
+            </div>
+        </div>
     </div>
 
     <script>
